@@ -4,7 +4,7 @@ export type TApiResponseDefault<T> = {
   status: boolean;
   statusCode: number;
   message: string;
-  data: T[];
+  data: T;
 };
 
 export type TApiResponseWithPagination<T> = {
@@ -27,7 +27,7 @@ export class ApiResponse {
   }
 
   static async default<T>(
-    data: T[],
+    data: T,
     message: string,
   ): Promise<TApiResponseDefault<T>> {
     return {

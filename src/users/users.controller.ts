@@ -1,16 +1,28 @@
 import {
+  Body,
   Controller,
   DefaultValuePipe,
   Get,
+  NotFoundException,
+  Param,
   ParseIntPipe,
+  Post,
+  Put,
   Query,
+  UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
 import {
   ApiResponse,
+  TApiResponseDefault,
   TApiResponseWithPagination,
 } from 'src/utils/generals/api-response';
+import { StripRequestContextPipe } from 'src/utils/pipes/strip-request-context.pipe';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
+import { UserInterceptor } from './user.interceptor';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -29,6 +41,36 @@ export class UsersController {
     return await ApiResponse.withPagination(
       await this.usersService.getAll(page, perPage, searchByName),
       'Success get data',
+    );
+  }
+
+  @Post()
+  async store(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<TApiResponseDefault<User>> {
+    return await ApiResponse.default(
+      await this.usersService.create(createUserDto),
+      'User has been created',
+    );
+  }
+
+  @Put(':id')
+  @UseInterceptors(UserInterceptor)
+  @UsePipes(new StripRequestContextPipe())
+  async update(
+    @Param('id', ParseIntPipe)
+    id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    if (!this.usersService.findOneById(id)) {
+      throw new NotFoundException(`User not found!`);
+    }
+
+    await this.usersService.update(id, updateUserDto);
+
+    return await ApiResponse.default(
+      await this.usersService.findOneById(id),
+      'User has been updated',
     );
   }
 }

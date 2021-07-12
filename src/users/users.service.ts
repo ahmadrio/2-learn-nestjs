@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Op } from 'sequelize';
 import { IPaginationResponse } from 'src/utils/services/pagination';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
 
 @Injectable()
@@ -25,9 +27,44 @@ export class UsersService {
       page: page,
       perPage: perPage,
       options: {
-        order: [['name', 'DESC']],
+        order: [['id', 'DESC']],
         ...otherConditional,
       },
+    });
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    return await this.usersRepository.create(createUserDto);
+  }
+
+  async findOneByEmail(
+    email: string,
+    exceptId?: number,
+  ): Promise<{ rows: User[]; count: number }> {
+    if (exceptId) {
+      return await this.usersRepository.findAndCountAll({
+        where: {
+          email: email,
+          id: { [Op.ne]: exceptId },
+        },
+      });
+    } else {
+      return await this.usersRepository.findAndCountAll({
+        where: { email: email },
+      });
+    }
+  }
+
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    return await this.usersRepository.update(updateUserDto, {
+      where: { id: id },
+      individualHooks: true,
+    });
+  }
+
+  async findOneById(id: number): Promise<User> {
+    return await this.usersRepository.findOne({
+      where: { id: id },
     });
   }
 }

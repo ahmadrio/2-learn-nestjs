@@ -1,5 +1,11 @@
-import { Column, Table } from 'sequelize-typescript';
+import {
+  BeforeCreate,
+  BeforeUpdate,
+  Column,
+  Table,
+} from 'sequelize-typescript';
 import { PaginationModel } from 'src/utils/services/pagination';
+import * as bcrypt from 'bcrypt';
 
 @Table({
   tableName: 'users',
@@ -16,4 +22,10 @@ export class User extends PaginationModel {
 
   @Column
   password: string;
+
+  @BeforeUpdate
+  @BeforeCreate
+  static async updateOrCreatePassword(instance: User): Promise<void> {
+    instance.password = await bcrypt.hash(instance.password, 10);
+  }
 }
