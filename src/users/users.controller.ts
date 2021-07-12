@@ -5,6 +5,7 @@ import {
   ParseIntPipe,
   Query,
 } from '@nestjs/common';
+import { ApiParam } from '@nestjs/swagger';
 import {
   ApiResponse,
   TApiResponseWithPagination,
@@ -17,6 +18,9 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @ApiParam({ name: 'page', required: false })
+  @ApiParam({ name: 'perPage', required: false })
+  @ApiParam({ name: 'searchByName', required: false })
   async index(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
     @Query('perPage', new DefaultValuePipe(10), ParseIntPipe) perPage?: number,
