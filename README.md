@@ -34,7 +34,7 @@ $ npm run start
   - [x] [GET] Get all users
   - [x] [POST] Create user (with unique validation)
   - [x] [PUT] Update user (with unique validation)
-  - [ ] [GET] Show user
+  - [x] [GET] Show user
   - [ ] [DELETE] Delete user
 - [ ] Buat authenticate dengan JWT
 - [ ] Buat auth login

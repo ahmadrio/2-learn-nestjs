@@ -39,8 +39,8 @@ export class UsersController {
     @Query('searchByName') searchByName?: string,
   ): Promise<TApiResponseWithPagination<User>> {
     return await ApiResponse.withPagination(
-      await this.usersService.getAll(page, perPage, searchByName),
-      'Success get data',
+      await this.usersService.getWithPaging(page, perPage, searchByName),
+      'Success get all data users',
     );
   }
 
@@ -61,8 +61,8 @@ export class UsersController {
     @Param('id', ParseIntPipe)
     id: number,
     @Body() updateUserDto: UpdateUserDto,
-  ) {
-    if (!this.usersService.findOneById(id)) {
+  ): Promise<TApiResponseDefault<User>> {
+    if (!(await this.usersService.findOneById(id))) {
       throw new NotFoundException(`User not found!`);
     }
 
@@ -71,6 +71,20 @@ export class UsersController {
     return await ApiResponse.default(
       await this.usersService.findOneById(id),
       'User has been updated',
+    );
+  }
+
+  @Get(':id')
+  async show(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<TApiResponseDefault<User>> {
+    if (!(await this.usersService.findOneById(id))) {
+      throw new NotFoundException(`User not found!`);
+    }
+
+    return await ApiResponse.default(
+      await this.usersService.findOneById(id),
+      'Success get data user',
     );
   }
 }

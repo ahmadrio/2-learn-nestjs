@@ -11,7 +11,7 @@ export class UsersService {
     @Inject('USERS_REPOSITORY') readonly usersRepository: typeof User,
   ) {}
 
-  async getAll(
+  async getWithPaging(
     page?: number,
     perPage?: number,
     searchByName?: string,
@@ -28,6 +28,7 @@ export class UsersService {
       perPage: perPage,
       options: {
         order: [['id', 'DESC']],
+        attributes: { exclude: ['password'] },
         ...otherConditional,
       },
     });
@@ -43,6 +44,7 @@ export class UsersService {
   ): Promise<{ rows: User[]; count: number }> {
     if (exceptId) {
       return await this.usersRepository.findAndCountAll({
+        attributes: { exclude: ['password'] },
         where: {
           email: email,
           id: { [Op.ne]: exceptId },
@@ -50,6 +52,7 @@ export class UsersService {
       });
     } else {
       return await this.usersRepository.findAndCountAll({
+        attributes: { exclude: ['password'] },
         where: { email: email },
       });
     }
@@ -63,7 +66,8 @@ export class UsersService {
   }
 
   async findOneById(id: number): Promise<User> {
-    return await this.usersRepository.findOne({
+    return await this.usersRepository.findOne<User>({
+      attributes: { exclude: ['password'] },
       where: { id: id },
     });
   }
