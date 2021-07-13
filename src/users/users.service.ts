@@ -58,7 +58,10 @@ export class UsersService {
     }
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<[number, User[]]> {
     return await this.usersRepository.update(updateUserDto, {
       where: { id: id },
       individualHooks: true,
@@ -68,6 +71,12 @@ export class UsersService {
   async findOneById(id: number): Promise<User> {
     return await this.usersRepository.findOne<User>({
       attributes: { exclude: ['password'] },
+      where: { id: id },
+    });
+  }
+
+  async deleteById(id: number): Promise<number> {
+    return await this.usersRepository.destroy({
       where: { id: id },
     });
   }

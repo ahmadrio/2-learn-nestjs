@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   DefaultValuePipe,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -86,5 +87,18 @@ export class UsersController {
       await this.usersService.findOneById(id),
       'Success get data user',
     );
+  }
+
+  @Delete(':id')
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<TApiResponseDefault<[]>> {
+    if (!(await this.usersService.findOneById(id))) {
+      throw new NotFoundException(`User not found!`);
+    }
+
+    await this.usersService.deleteById(id);
+
+    return await ApiResponse.default([], 'Success delete user');
   }
 }

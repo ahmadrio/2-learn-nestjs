@@ -30,11 +30,11 @@ $ npm run start
 - [x] Koneksi ke database
 - [x] Buat migration
 - [x] Buat seeder
-- [ ] Buat API untuk modules `/users`
+- [x] Buat API untuk modules `/users`
   - [x] [GET] Get all users
   - [x] [POST] Create user (with unique validation)
   - [x] [PUT] Update user (with unique validation)
   - [x] [GET] Show user
-  - [ ] [DELETE] Delete user
+  - [x] [DELETE] Delete user
 - [ ] Buat authenticate dengan JWT
 - [ ] Buat auth login
