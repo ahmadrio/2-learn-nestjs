@@ -1,3 +1,3 @@
-import { config as configDev } from './config/config.development';
+import { configDatabase } from './config/database';
 
-export default configDev;
+export default configDatabase[process.env.DB_DIALECT];
