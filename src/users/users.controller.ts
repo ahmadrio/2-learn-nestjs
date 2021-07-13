@@ -4,14 +4,11 @@ import {
   DefaultValuePipe,
   Delete,
   Get,
-  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
   Put,
   Query,
-  UseInterceptors,
-  UsePipes,
 } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
 import {
@@ -19,11 +16,9 @@ import {
   TApiResponseDefault,
   TApiResponseWithPagination,
 } from 'src/utils/generals/api-response';
-import { StripRequestContextPipe } from 'src/utils/pipes/strip-request-context.pipe';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './user.entity';
-import { UserInterceptor } from './user.interceptor';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -41,7 +36,7 @@ export class UsersController {
   ): Promise<TApiResponseWithPagination<User>> {
     return await ApiResponse.withPagination(
       await this.usersService.getWithPaging(page, perPage, searchByName),
-      'Success get all data users',
+      `success get all data users`,
     );
   }
 
@@ -51,27 +46,21 @@ export class UsersController {
   ): Promise<TApiResponseDefault<User>> {
     return await ApiResponse.default(
       await this.usersService.create(createUserDto),
-      'User has been created',
+      `user has been created`,
     );
   }
 
   @Put(':id')
-  @UseInterceptors(UserInterceptor)
-  @UsePipes(new StripRequestContextPipe())
   async update(
     @Param('id', ParseIntPipe)
     id: number,
     @Body() updateUserDto: UpdateUserDto,
   ): Promise<TApiResponseDefault<User>> {
-    if (!(await this.usersService.findOneById(id))) {
-      throw new NotFoundException(`User not found!`);
-    }
-
     await this.usersService.update(id, updateUserDto);
 
     return await ApiResponse.default(
       await this.usersService.findOneById(id),
-      'User has been updated',
+      `user has been updated`,
     );
   }
 
@@ -79,13 +68,9 @@ export class UsersController {
   async show(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<TApiResponseDefault<User>> {
-    if (!(await this.usersService.findOneById(id))) {
-      throw new NotFoundException(`User not found!`);
-    }
-
     return await ApiResponse.default(
       await this.usersService.findOneById(id),
-      'Success get data user',
+      `success get data user`,
     );
   }
 
@@ -93,12 +78,8 @@ export class UsersController {
   async delete(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<TApiResponseDefault<[]>> {
-    if (!(await this.usersService.findOneById(id))) {
-      throw new NotFoundException(`User not found!`);
-    }
-
     await this.usersService.deleteById(id);
 
-    return await ApiResponse.default([], 'Success delete user');
+    return await ApiResponse.default([], `Success delete user`);
   }
 }

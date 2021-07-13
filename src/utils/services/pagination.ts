@@ -22,47 +22,21 @@ export interface IPaginationResponse<I> {
 export class PaginationModel extends Model {
   static async paginate<T extends typeof PaginationModel, I = InstanceType<T>>(
     this: T,
-    { page = 1, perPage = 10, options = {} }: IPaginationOptions = {
-      page: 1,
-      perPage: 10,
-      options: {},
-    },
+    { page = 1, perPage = 10, options = {} }: IPaginationOptions,
   ): Promise<IPaginationResponse<I>> {
-    const optionParams = Object.assign({}, options);
-    const countOptions = Object.keys(optionParams).reduce((acc, key) => {
-      if (!['order', 'attributes', 'include'].includes(key)) {
-        acc[key] = optionParams[key];
-      }
-      return acc;
-    }, {});
+    options.limit = perPage;
+    options.offset = perPage * (page - 1);
 
-    optionParams.limit = perPage;
-    optionParams.offset = perPage * (page - 1);
-
-    if (optionParams.limit) {
-      console.warn(`(sequelize-pagination) Warning: limit option is ignored.`);
-    }
-    if (optionParams.offset) {
-      console.warn(`(sequelize-pagination) Warning: offset option is ignored.`);
-    }
-
-    if (optionParams.order) optionParams.order = options.order;
-
-    const [count, rows] = await Promise.all([
-      this.count(countOptions),
-      this.findAll(optionParams),
-    ]);
-
-    const total = optionParams.group !== undefined ? count['length'] : count;
+    const { count, rows } = await this.findAndCountAll(options);
     const data = rows as unknown as I[];
-    const totalPage = Math.ceil(total / perPage);
+    const totalPage = Math.ceil(count / perPage);
 
     return {
       data: data,
       meta: {
         page: page,
         perPage: perPage,
-        total: total,
+        total: count,
         totalPage: totalPage,
       },
     };

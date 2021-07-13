@@ -32,8 +32,8 @@ $ npm run start
 - [x] Buat seeder
 - [x] Buat API untuk modules `/users`
   - [x] [GET] Get all users
-  - [x] [POST] Create user (with unique validation)
-  - [x] [PUT] Update user (with unique validation)
+  - [x] [POST] Create user
+  - [x] [PUT] Update user
   - [x] [GET] Show user
   - [x] [DELETE] Delete user
 - [ ] Buat authenticate dengan JWT

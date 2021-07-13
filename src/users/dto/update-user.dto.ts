@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty } from 'class-validator';
-import { UserEmailUnique } from '../rules/user-email.unique';
 
 export class UpdateUserDto {
   @IsNotEmpty()
@@ -12,7 +11,6 @@ export class UpdateUserDto {
 
   @IsNotEmpty()
   @IsEmail()
-  @UserEmailUnique()
   @ApiProperty({
     name: 'email',
     required: true,

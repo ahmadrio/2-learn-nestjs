@@ -1,4 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  UnprocessableEntityException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Op } from 'sequelize';
 import { IPaginationResponse } from 'src/utils/services/pagination';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -35,33 +40,35 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
+    if (await this.findOneByEmail(createUserDto.email)) {
+      throw new UnprocessableEntityException(`email has already exists`);
+    }
+
     return await this.usersRepository.create(createUserDto);
   }
 
-  async findOneByEmail(
-    email: string,
-    exceptId?: number,
-  ): Promise<{ rows: User[]; count: number }> {
+  async findOneByEmail(email: string, exceptId?: number): Promise<User> {
+    const where = { email };
     if (exceptId) {
-      return await this.usersRepository.findAndCountAll({
-        attributes: { exclude: ['password'] },
-        where: {
-          email: email,
-          id: { [Op.ne]: exceptId },
-        },
-      });
-    } else {
-      return await this.usersRepository.findAndCountAll({
-        attributes: { exclude: ['password'] },
-        where: { email: email },
-      });
+      where['id'] = { [Op.ne]: exceptId };
     }
+
+    return await this.usersRepository.findOne({
+      attributes: { exclude: ['password'] },
+      where,
+    });
   }
 
   async update(
     id: number,
     updateUserDto: UpdateUserDto,
   ): Promise<[number, User[]]> {
+    await this.findOneById(id);
+
+    if (await this.findOneByEmail(updateUserDto.email, id)) {
+      throw new UnprocessableEntityException(`email has already exists`);
+    }
+
     return await this.usersRepository.update(updateUserDto, {
       where: { id: id },
       individualHooks: true,
@@ -69,13 +76,18 @@ export class UsersService {
   }
 
   async findOneById(id: number): Promise<User> {
-    return await this.usersRepository.findOne<User>({
+    const user = await this.usersRepository.findOne<User>({
       attributes: { exclude: ['password'] },
-      where: { id: id },
+      where: { id },
     });
+
+    if (user) return user;
+    throw new NotFoundException(`user not found`);
   }
 
   async deleteById(id: number): Promise<number> {
+    await this.findOneById(id);
+
     return await this.usersRepository.destroy({
       where: { id: id },
     });
