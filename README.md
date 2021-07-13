@@ -21,7 +21,7 @@ $ npm run db:seed
 $ npm run start
 ```
 
-- Buka browser dengan url: `http://localhost:3000/api/v1/`
+- Buka browser dengan url: `http://localhost:3000`
 
 - Done.
 
